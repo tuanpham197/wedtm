@@ -1,6 +1,6 @@
 const myForm = document.getElementById("myForm");
 const btnSubmit = document.getElementById("btnSubmit");
-const scriptUrl = "https://script.google.com/macros/s/AKfycby8SsIPGgTzriv6-0t2y12QPhqrbyOxbMRAWb6XLglTwmsRdV5GUP4EOObbFTSa4CMX/exec";
+const scriptUrl = "https://script.google.com/macros/s/AKfycbxWlSA9PeHqGyO6lCQCZ2SYOwmBGeeqKwSI6JYqWeJHu30gy2x5uwKy6HKERCmYjBA8/exec";
 
 btnSubmit.addEventListener("click", function (e) {
     e.preventDefault();
@@ -20,7 +20,6 @@ btnSubmit.addEventListener("click", function (e) {
     const data = {
         name: nameVal,
         message: message,
-        timestamp: new Date().toISOString() // Thêm timestamp nếu cần
     };
 
     // Gửi request POST
@@ -30,19 +29,13 @@ btnSubmit.addEventListener("click", function (e) {
         headers: {
             "Content-Type": "application/json",
         },
-        mode: "no-cors" // Thêm dòng này
-        // Loại bỏ mode: "no-cors" để nhận được response
+        mode: "no-cors"
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
+    
     .then(result => {
         console.log("Phản hồi từ server:", result);
         if (result.status === "success") {
-            alert("Đã gửi thành công!");
+            alert("Tuấn và Minh xin cảm ơn bạn đã gửi lời chúc!");
             // Reset form nếu cần
             myForm.reset();
             // Cập nhật danh sách hiển thị
@@ -53,6 +46,7 @@ btnSubmit.addEventListener("click", function (e) {
         console.error("Lỗi:", error);
         alert("Có lỗi xảy ra khi gửi dữ liệu!");
     });
+    alert("Tuấn và Minh xin cảm ơn bạn đã gửi lời chúc!");
 });
 
 function fetchAndRenderData() {
@@ -61,16 +55,19 @@ function fetchAndRenderData() {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error('Network response was not ok: ' + response.status);
         }
-        return response.json();
+        return response.json(); // Lấy dữ liệu JSON từ server
     })
     .then(result => {
+      console.log(result, 'Debug ')
         if (result.status === "success") {
             const data = result.data;
+            console.log(data, 'Debug ')
             const reversedData = data.reverse();
             const container = document.getElementById("scrollBox");
 
+            
             let html = "";
             reversedData.forEach((item) => {
                 html += `<div class="message"><span id="name_guest">${item.name}</span>:<i> ${item.message}</i></div>`;
@@ -87,3 +84,6 @@ function fetchAndRenderData() {
 
 // Gọi hàm lần đầu
 fetchAndRenderData();
+
+// Đặt polling: 5000ms = 5 giây (tùy ý)
+setInterval(fetchAndRenderData, 1000);
